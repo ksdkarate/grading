@@ -1,0 +1,60 @@
+Options +FollowSymlinks
+RewriteEngine on
+RewriteBase /
+
+#ignores existing files and directories
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+
+RewriteRule index.htm http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule index.html http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule index.shtml http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule index.asp http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule default.asp http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule index.aspx http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule index.cfm http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule index.pl http://www.%{HTTP_HOST}% [L,R=301]
+RewriteRule default.htm http://www.%{HTTP_HOST}% [L,R=301]
+
+RewriteCond %{HTTPS} off
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+
+RewriteCond %{HTTPS} on
+RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+# Redirect the all users to maintenance.html
+
+#send everything through index.php
+RewriteCond %{THE_REQUEST} ^.*index\.php
+RewriteRule ^(.*)index.php$ http://www.%{HTTP_HOST}%/$1 [L,R=301]
+
+#adds slash on end of directories
+RewriteCond %{REQUEST_URI} /+[^\.]+$
+RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]
+
+Options -indexes
+
+ErrorDocument 400 /
+ErrorDocument 403 /
+ErrorDocument 404 /
+ErrorDocument 500 /
+
+<FilesMatch "\.(css|flv|gif|htm|html|ico|jpe|jpeg|jpg|js|mp3|mp4|png|pdf|swf|txt)$">
+	<IfModule mod_expires.c>
+		ExpiresActive Off
+	</IfModule>
+	<IfModule mod_headers.c>
+		FileETag None
+		Header unset ETag
+		Header unset Pragma
+		Header unset Cache-Control
+		Header unset Last-Modified
+		Header set Pragma "no-cache"
+		Header set Cache-Control "max-age=0, no-cache, no-store, must-revalidate"
+		Header set Expires "Thu, 1 Jan 1970 00:00:00 GMT"
+	</IfModule>
+</FilesMatch>
+
+AddDefaultCharset UTF-8
